@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Question } from '../types';
 import { Check, X, Eye, EyeOff, HelpCircle } from 'lucide-react';
 
@@ -11,6 +11,17 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+  // Randomize options order on mount or when data changes
+  const shuffledOptions = useMemo(() => {
+    const options = [...data.options];
+    // Fisher-Yates shuffle algorithm
+    for (let i = options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [options[i], options[j]] = [options[j], options[i]];
+    }
+    return options;
+  }, [data]);
 
   // Reset state when data changes
   useEffect(() => {
@@ -49,7 +60,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index }) => {
       {/* Content Area - Options */}
       <div className="p-5">
         <div className="space-y-3">
-          {data.options.map((option, idx) => {
+          {shuffledOptions.map((option, idx) => {
             let itemClass = "w-full text-left p-3 rounded-lg border text-sm font-medium transition-all duration-200 flex items-center justify-between group ";
             
             if (selectedOption === option) {
