@@ -1,0 +1,5 @@
+{
+  "name": "QuadFlash",
+  "description": "A responsive flashcard app that displays questions in a continuous scrolling list with JSON data support.",
+  "requestFramePermissions": []
+}
