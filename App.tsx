@@ -3,7 +3,7 @@ import { Question } from './types';
 import Flashcard from './components/Flashcard';
 import DataInput from './components/DataInput';
 import { saveQuestionsToServer, loadQuestionsFromServer, clearData } from './services/storageService';
-import { RotateCcw, LayoutList, ScrollText } from 'lucide-react';
+import { RotateCcw, ScrollText } from 'lucide-react';
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
