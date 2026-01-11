@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Question } from '../types';
-import { Check, X, Eye, EyeOff, HelpCircle, Star } from 'lucide-react';
+import { Check, X, Eye, EyeOff, HelpCircle, Star, NotebookPen } from 'lucide-react';
 
 interface FlashcardProps {
   data: Question;
   index: number;
   onToggleDoubt?: () => void;
   onToggleImportant?: () => void;
+  onUpdateNote?: (note: string) => void;
 }
 
-const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onToggleImportant }) => {
+const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onToggleImportant, onUpdateNote }) => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  // Initialize showNotes to true if there is already a note content
+  const [showNotes, setShowNotes] = useState(() => !!data.note && data.note.trim().length > 0);
 
   // Randomize options order on mount or when data changes
   const shuffledOptions = useMemo(() => {
@@ -25,13 +28,12 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onTog
     return options;
   }, [data]);
 
-  // Reset state when data changes (but not when doubt/important changes)
-  // We use data.question as key dependency to avoid resetting on flag changes
+  // Reset state when data changes (but not when doubt/important/note changes)
   useEffect(() => {
     setSelectedOption(null);
     setShowAnswer(false);
     setIsCorrect(null);
-  }, [data.question, data.answer, data.options]); // only reset if the core content changes
+  }, [data.question, data.answer, data.options]); 
 
   const handleOptionClick = (option: string) => {
     if (showAnswer) return; // Disable interaction if answer is shown (optional)
@@ -46,6 +48,10 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onTog
 
   const toggleAnswer = () => {
     setShowAnswer(!showAnswer);
+  };
+
+  const toggleNotes = () => {
+    setShowNotes(!showNotes);
   };
 
   return (
@@ -64,6 +70,7 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onTog
         <div className="absolute top-0 right-0 p-2 flex gap-1">
           {data.isDoubt && <div className="h-2 w-2 rounded-full bg-amber-500"></div>}
           {data.isImportant && <div className="h-2 w-2 rounded-full bg-indigo-500"></div>}
+          {data.note && data.note.trim().length > 0 && <div className="h-2 w-2 rounded-full bg-green-500"></div>}
         </div>
 
         <h3 className="text-lg font-semibold text-slate-800 leading-snug pr-4">{data.question}</h3>
@@ -132,6 +139,19 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onTog
              <Star size={16} className={data.isImportant ? "fill-indigo-500 text-indigo-500 mr-1.5" : "mr-1.5"} />
              Important
            </button>
+
+           <button 
+             onClick={toggleNotes}
+             className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
+               showNotes
+               ? 'bg-green-100 text-green-700 border-green-200' 
+               : 'bg-white text-slate-500 border-slate-200 hover:bg-green-50 hover:text-green-600'
+             }`}
+             title="Add Notes"
+           >
+             <NotebookPen size={16} className={showNotes ? "text-green-600 mr-1.5" : "mr-1.5"} />
+             Notes
+           </button>
         </div>
 
         {/* Show Answer Button */}
@@ -162,6 +182,19 @@ const Flashcard: React.FC<FlashcardProps> = ({ data, index, onToggleDoubt, onTog
         <div className="bg-blue-50 px-4 py-3 border-t border-blue-100 animate-in slide-in-from-bottom-2 fade-in duration-300">
           <p className="text-xs text-blue-600 font-bold uppercase mb-1">Answer</p>
           <p className="text-blue-900 font-medium">{data.answer}</p>
+        </div>
+      )}
+
+      {/* Notes Section */}
+      {showNotes && (
+        <div className="bg-green-50 border-t border-green-100 p-4 animate-in slide-in-from-top-2 fade-in duration-300">
+          <label className="block text-xs font-bold text-green-600 uppercase mb-2">My Notes</label>
+          <textarea 
+            className="w-full min-h-[150px] p-3 rounded-lg border border-green-200 bg-white text-green-700 placeholder-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent resize-y text-sm"
+            placeholder="Type your notes here..."
+            value={data.note || ''}
+            onChange={(e) => onUpdateNote && onUpdateNote(e.target.value)}
+          />
         </div>
       )}
     </div>

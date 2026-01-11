@@ -4,6 +4,7 @@ export interface Question {
   answer: string;
   isDoubt?: boolean;
   isImportant?: boolean;
+  note?: string;
 }
 
 export interface FlashcardSet {

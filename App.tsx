@@ -52,6 +52,13 @@ const App: React.FC = () => {
     saveQuestionsToServer(updatedQuestions); // Persist immediately
   };
 
+  const updateNote = (index: number, noteText: string) => {
+    const updatedQuestions = [...questions];
+    updatedQuestions[index].note = noteText;
+    setQuestions(updatedQuestions);
+    saveQuestionsToServer(updatedQuestions);
+  };
+
   // Filter questions based on active tab
   // We map first to preserve original indices for the toggle function
   const displayItems = questions
@@ -165,6 +172,7 @@ const App: React.FC = () => {
                     index={item.originalIndex} 
                     onToggleDoubt={() => toggleStatus(item.originalIndex, 'doubt')}
                     onToggleImportant={() => toggleStatus(item.originalIndex, 'important')}
+                    onUpdateNote={(text) => updateNote(item.originalIndex, text)}
                   />
                 </div>
               ))
